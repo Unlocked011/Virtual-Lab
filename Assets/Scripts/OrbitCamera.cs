@@ -11,25 +11,29 @@ public class OrbitCamera : MonoBehaviour
     private Transform target;
     private float targetDistance;
     private bool isTransitioning = false;
+    private bool isDragging = false;
 
     void Update()
     {
-        if (isTransitioning && target != null)
+        if (!isDragging)
         {
-            SmoothTransitionToTarget();
-            return;
-        }
-
-        if (Input.touchCount == 1 && target != null)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Moved)
+            if (isTransitioning && target != null)
             {
-                float rotX = touch.deltaPosition.y * rotationSpeed;
-                float rotY = -touch.deltaPosition.x * rotationSpeed;
+                SmoothTransitionToTarget();
+                return;
+            }
 
-                transform.RotateAround(target.position, Vector3.up, rotY);
-                transform.RotateAround(target.position, transform.right, rotX);
+            if (Input.touchCount == 1 && target != null)
+            {
+                Touch touch = Input.GetTouch(0);
+                if (touch.phase == TouchPhase.Moved)
+                {
+                    float rotX = touch.deltaPosition.y * rotationSpeed;
+                    float rotY = -touch.deltaPosition.x * rotationSpeed;
+
+                    transform.RotateAround(target.position, Vector3.up, rotY);
+                    transform.RotateAround(target.position, transform.right, rotX);
+                }
             }
         }
     }
@@ -47,11 +51,11 @@ public class OrbitCamera : MonoBehaviour
         if (renderer != null)
         {
             Vector3 size = renderer.bounds.size;
-            float maxSize = Mathf.Max(size.x, size.y, size.z); // Najwiêkszy wymiar obiektu
-            return baseDistance + (maxSize * sizeMultiplier); // Im wiêkszy obiekt, tym wiêksza odleg³oœæ
+            float maxSize = Mathf.Max(size.x, size.y, size.z);
+            return baseDistance + (maxSize * sizeMultiplier);
         }
 
-        return baseDistance; // Jeœli brak renderera, u¿yj domyœlnej odleg³oœci
+        return baseDistance;
     }
 
     private void SmoothTransitionToTarget()
@@ -69,5 +73,10 @@ public class OrbitCamera : MonoBehaviour
         {
             isTransitioning = false;
         }
+    }
+
+    public void SetDragging(bool dragging)
+    {
+        isDragging = dragging;
     }
 }
