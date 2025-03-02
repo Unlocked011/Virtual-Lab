@@ -11,29 +11,28 @@ public class OrbitCamera : MonoBehaviour
     private Transform target;
     private float targetDistance;
     private bool isTransitioning = false;
-    private bool isDragging = false;
+    private bool isObjectBeingMoved = false; 
 
     void Update()
     {
-        if (!isDragging)
+        if (isObjectBeingMoved) return; 
+
+        if (isTransitioning && target != null)
         {
-            if (isTransitioning && target != null)
-            {
-                SmoothTransitionToTarget();
-                return;
-            }
+            SmoothTransitionToTarget();
+            return;
+        }
 
-            if (Input.touchCount == 1 && target != null)
+        if (Input.touchCount == 1 && target != null)
+        {
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Moved)
             {
-                Touch touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Moved)
-                {
-                    float rotX = touch.deltaPosition.y * rotationSpeed;
-                    float rotY = -touch.deltaPosition.x * rotationSpeed;
+                float rotX = touch.deltaPosition.y * rotationSpeed;
+                float rotY = -touch.deltaPosition.x * rotationSpeed;
 
-                    transform.RotateAround(target.position, Vector3.up, rotY);
-                    transform.RotateAround(target.position, transform.right, rotX);
-                }
+                transform.RotateAround(target.position, Vector3.up, rotY);
+                transform.RotateAround(target.position, transform.right, rotX);
             }
         }
     }
@@ -43,6 +42,11 @@ public class OrbitCamera : MonoBehaviour
         target = newTarget;
         targetDistance = CalculateDistanceBasedOnSize(target);
         isTransitioning = true;
+    }
+
+    public void SetObjectBeingMoved(bool isMoving)
+    {
+        isObjectBeingMoved = isMoving;
     }
 
     private float CalculateDistanceBasedOnSize(Transform obj)
@@ -73,10 +77,5 @@ public class OrbitCamera : MonoBehaviour
         {
             isTransitioning = false;
         }
-    }
-
-    public void SetDragging(bool dragging)
-    {
-        isDragging = dragging;
     }
 }

@@ -4,8 +4,11 @@ using System.Collections.Generic;
 public class ObjectSelector : MonoBehaviour
 {
     public OrbitCamera orbitCamera;
+    public ObjectMover objectMover;
     public List<Transform> excludedObjects;
 
+    private float lastClickTime = 0f;
+    private float doubleClickThreshold = 0.3f;
 
     void Update()
     {
@@ -16,9 +19,22 @@ public class ObjectSelector : MonoBehaviour
             {
                 if (excludedObjects.Contains(hit.transform))
                 {
-                    return;
+                    return; 
                 }
-                orbitCamera.SetTarget(hit.transform);
+
+                float timeSinceLastClick = Time.time - lastClickTime;
+                lastClickTime = Time.time;
+
+                if (timeSinceLastClick < doubleClickThreshold)
+                {
+
+                    orbitCamera.SetTarget(hit.transform);
+                }
+                else
+                { 
+                    objectMover.SetSelectedObject(hit.transform);
+
+                }
             }
         }
     }
