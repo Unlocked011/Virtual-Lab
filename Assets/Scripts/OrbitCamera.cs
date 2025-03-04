@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 public class OrbitCamera : MonoBehaviour
@@ -8,10 +9,18 @@ public class OrbitCamera : MonoBehaviour
     public float baseDistance = 10f;
     public float sizeMultiplier = 1.5f;
 
+    public Vector3 defaultPosition;
+    public Quaternion defaultRotation;
     private Transform target;
     private float targetDistance;
     private bool isTransitioning = false;
     private bool isObjectBeingMoved = false; 
+
+    void Start()
+    {
+        defaultPosition = transform.position;
+        defaultRotation = transform.rotation;
+    }
 
     void Update()
     {
@@ -77,5 +86,15 @@ public class OrbitCamera : MonoBehaviour
         {
             isTransitioning = false;
         }
+    }
+
+    public void ResetCamera()
+    {
+        target = null;
+        isObjectBeingMoved = false;
+        isTransitioning = false;
+
+        transform.position = defaultPosition;
+        transform.rotation = defaultRotation;
     }
 }
